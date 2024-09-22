@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-   previewFeatures = ["relationJoins"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -37,23 +37,27 @@ model Article {
 }
 
 model Product {
-  id          String           @id @default(uuid())
-  title       String           @unique
-  price       Float            @default(0)
-  description String?          @default("")
-  slug        String           @unique
-  stock       Int              @default(0)
+  id          String          @id @default(uuid())
+  title       String          @unique
+  price       Float           @default(0)
+  description String?         @default("")
+  slug        String          @unique
+  stock       Int             @default(0)
+  type        String?          @default("")
   sizes       String[]
   gender      String
-  tags        String[]         @default([])
-  images      Product_image[]  // Relación uno a muchos con Product_image
+  tags        String[]        @default([])
+  images      Product_image[] // Relación uno a muchos con Product_image
 
+  @@map("products") // Nombre de la tabla en la base de datos
   @@index([slug]) // Index para facilitar búsquedas por slug
 }
 
 model Product_image {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   url       String
   productId String
-  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade) // Relación con Product
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // Relación con Product
+   
+   @@map("product_images") // Nombre de la tabla en la base de datos
 }

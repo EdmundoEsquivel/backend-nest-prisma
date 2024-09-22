@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import myPrisma from './prisma/product.prisma';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid'
-import { ProductEntity } from './entities/product.entity';
 
 
 
@@ -113,24 +112,62 @@ async findOnePlain(term: string) {
   async update(id: string, updateProductDto: UpdateProductDto) {
     // Buscar el producto existente
     const product = await this.prisma.product.findUnique({
-      where: { id }
+      where: { id },
+      include: { images: true }, // Incluir las imágenes relacionadas
     });
-
+  
     if (!product) {
       throw new NotFoundException(`Product with id: ${id} not found`);
     }
-
+  
+    const { images = [], ...productData } = updateProductDto;
+  
     try {
-      // Actualizar el producto
-      const updatedProduct = await myPrisma.product.update({
-        where: { id },
-        data: updateProductDto
+      // Iniciar una transacción para asegurar que las operaciones se hagan juntas
+      const updatedProduct = await this.prisma.$transaction(async (prisma) => {
+        // Actualizar el producto principal sin imágenes
+        const updatedProduct = await prisma.product.update({
+          where: { id },
+          data: productData, // Actualizar el resto de los campos
+          include: { images: true }, // Incluir las imágenes actuales en el retorno
+        });
+  
+        if (images && images.length > 0) {
+          // Eliminar las imágenes existentes
+          await prisma.product_image.deleteMany({
+            where: { productId: id },
+          });
+  
+          // Insertar las nuevas imágenes
+          const imageCreates = images.map((url) => ({
+            url,
+            productId: id,
+          }));
+  
+          await prisma.product_image.createMany({
+            data: imageCreates,
+          });
+        }
+  
+        // Retornar el producto actualizado dentro de la transacción
+        return prisma.product.findUnique({
+          where: { id },
+          include: { images: true }, // Asegurar que se incluyan las nuevas imágenes
+        });
       });
-      return updatedProduct;
+  
+      // Extraer las imágenes del producto y retornar en formato plano
+      const { images: updatedImages = [], ...rest } = updatedProduct;
+      return {
+        ...rest,
+        images: updatedImages.map(image => image.url) // Retornar las URLs de las imágenes
+      };
     } catch (error) {
       this.handleDBExceptions(error); // Define tu función para manejar excepciones de DB
     }
   }
+  
+  
 
   async remove(id: string) {
     const product = await this.prisma.product.findUnique({ where: { id } });
@@ -150,5 +187,15 @@ async findOnePlain(term: string) {
     throw new InternalServerErrorException('Unexpected error, check server logs');
 
   }
+
+  async deleteAllProducts() {
+    try {
+      // Eliminar todos los productos usando Prisma
+      return await this.prisma.product.deleteMany({});
+    } catch (error) {
+      this.handleDBExceptions(error); // Manejar las excepciones de la base de datos
+    }
+  }
+  
 
 }
