@@ -26,7 +26,7 @@ export class ArticleEntity implements Article {
   updatedAt: Date;
   
   @ApiProperty({ required: false, nullable: true })
-  authorId: number | null;
+  authorId: string | null;
 
   @ApiProperty({ required: false, type: UserEntity })
   author?: UserEntity;

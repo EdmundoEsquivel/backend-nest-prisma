@@ -15,13 +15,19 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String       @id @default(uuid())
   name      String?
   email     String    @unique
   password  String
+  fullName  String?
+  isActive  Boolean   @default(true)
+  role      String[]  @default(["user"])   
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   articles  Article[]
+  products  Product[]
+
+  @@map("users") // Nombre de la tabla en la base de datos  
 }
 
 model Article {
@@ -33,7 +39,7 @@ model Article {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   author      User?    @relation(fields: [authorId], references: [id])
-  authorId    Int?
+  authorId    String?
 }
 
 model Product {
@@ -48,6 +54,8 @@ model Product {
   gender      String
   tags        String[]        @default([])
   images      Product_image[] // Relación uno a muchos con Product_image
+  user        User            @relation(fields: [userId], references: [id])
+  userId      String
 
   @@map("products") // Nombre de la tabla en la base de datos
   @@index([slug]) // Index para facilitar búsquedas por slug

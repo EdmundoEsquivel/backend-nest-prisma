@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { ValidRoles } from '../src/auth/interfaces/valid-roles';
 
 // initialize Prisma Client
 const prisma = new PrismaClient();
@@ -11,6 +12,7 @@ async function main() {
 
   const passwordSabin = await bcrypt.hash('password-sabin', roundsOfHashing);
   const passwordAlex = await bcrypt.hash('password-alex', roundsOfHashing);
+  const passwordEdmundo = await bcrypt.hash('Adminsax01', roundsOfHashing);
 
   const user1 = await prisma.user.upsert({
     where: { email: 'sabin@adams.com' },
@@ -33,6 +35,19 @@ async function main() {
       email: 'alex@ruheni.com',
       name: 'Alex Ruheni',
       password: passwordAlex,
+    },
+  });
+
+  const user3 = await prisma.user.upsert({
+    where: { email: 'edmundoesquivel@live.com' },
+    update: {
+      password: passwordEdmundo,
+    },
+    create: {
+      email: 'edmundoesquivel@live.com',
+      name: 'Edmundo Esquivel',
+      password: passwordEdmundo,
+      role: [ValidRoles.admin, ValidRoles.user],
     },
   });
 

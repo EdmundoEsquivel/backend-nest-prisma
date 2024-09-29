@@ -47,5 +47,7 @@ images: string[];
 @Exclude()
 type: string;
 
+@ApiProperty()
+userId: string;
 
 }

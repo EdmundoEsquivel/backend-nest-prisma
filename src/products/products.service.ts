@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import myPrisma from './prisma/product.prisma';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid'
+import { User } from '@prisma/client';
 
 
 
@@ -15,7 +16,7 @@ export class ProductsService {
 
   constructor(private prisma: PrismaService) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user: User) {
     try {
       // Extraer imágenes del DTO
       const { images = [], ...productData } = createProductDto;
@@ -27,6 +28,7 @@ export class ProductsService {
           images: {
             create: images.map(imageUrl => ({ url: imageUrl })),  // Crear las imágenes a partir de URLs
           },
+          user: { connect: { id: user.id } },  // Conectar el producto con el usuario   
         },
         include: {
           images: true,  // Incluir las imágenes en la respuesta
@@ -47,6 +49,14 @@ export class ProductsService {
         skip: offset,
         include: {
           images: true,
+          user: {
+            select: {
+              id: true,         // Incluye el campo 'id'
+              name: true,       // Incluye el campo 'name'
+              email: true,      // Incluye el campo 'email'
+              // No incluir el campo 'password'
+            },
+          }
         },
       }
     );
@@ -109,7 +119,7 @@ async findOnePlain(term: string) {
   }
 
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user: User) {
     // Buscar el producto existente
     const product = await this.prisma.product.findUnique({
       where: { id },
@@ -128,7 +138,10 @@ async findOnePlain(term: string) {
         // Actualizar el producto principal sin imágenes
         const updatedProduct = await prisma.product.update({
           where: { id },
-          data: productData, // Actualizar el resto de los campos
+          data: {
+            ...productData,
+            userId: user.id, // Asegurar que el usuario actual es el propietario
+          }, // Actualizar el resto de los campos
           include: { images: true }, // Incluir las imágenes actuales en el retorno
         });
   

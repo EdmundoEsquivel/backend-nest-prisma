@@ -8,6 +8,10 @@ export class CreateUserDto {
   name: string;
 
   @IsString()
+  @ApiProperty()
+  fullName: string;
+
+  @IsString()
   @IsNotEmpty()
   @ApiProperty()
   email: string;
@@ -17,4 +21,6 @@ export class CreateUserDto {
   @MinLength(6)
   @ApiProperty()
   password: string;
+
+  
 }
