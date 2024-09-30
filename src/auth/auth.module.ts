@@ -24,8 +24,8 @@ export const jwtSecret = process.env.JWT_SECRET;
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService : ConfigService) => {
-        console.log('configService.get<string>(JWT_SECRET)', configService.get<string>('JWT_SECRET'));
-        console.log('process.env.JWT_SECRET', process.env.JWT_SECRET);
+        // console.log('configService.get<string>(JWT_SECRET)', configService.get<string>('JWT_SECRET'));
+        // console.log('process.env.JWT_SECRET', process.env.JWT_SECRET);
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: { expiresIn: '2h' }, // e.g. 30s, 7d, 24h

@@ -11,6 +11,7 @@ import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { MessagesWsModule } from './messages-ws/messages-ws.module';
 
 
 
@@ -20,7 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ServeStaticModule.forRoot({
     rootPath: join(__dirname,'../..','public'), 
   })
-  ,ProductsModule, PrismaModule, ArticlesModule, UsersModule, AuthModule, CommonModule, SeedModule, FilesModule],
+  ,ProductsModule, PrismaModule, ArticlesModule, UsersModule, AuthModule, CommonModule, SeedModule, FilesModule, MessagesWsModule],
   controllers: [AppController],
   providers: [AppService],
 

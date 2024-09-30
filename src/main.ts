@@ -43,7 +43,7 @@ async function bootstrap() {
   // app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
 
-  console.log('PORT:', process.env.PORT);
+  // console.log('PORT:', process.env.PORT);
   await app.listen(process.env.PORT || 3000);
 
   logger.log(`App esta corriendo en puerto ${process.env.PORT || 3000}`);

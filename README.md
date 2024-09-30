@@ -129,3 +129,27 @@ Crear un decorador una carpeta especifica
 ```
 nest g d auth/decorators/roleProtected --no-spec
 ```
+
+Vamos a trabajar con WebSockets 
+```
+npm i --save @nestjs/websockets @nestjs/platform-socket.io
+npm add socket.io
+```
+Instalo dependencias y creo un nuevo recurso
+```
+nest g res messagesWs --no-spec
+```
+
+crear una aplicacion en vite TS
+```
+npm create vite 
+-name
+-vite
+-typescript
+
+npm install dependencias
+
+instalar el cliente de io 
+npm add socket.io-client
+
+```
